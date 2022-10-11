@@ -166,7 +166,6 @@
       <Version>4.3.2</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="..\Rimshot.Shared\Rimshot.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <ContentSQLiteInteropFiles>true</ContentSQLiteInteropFiles>

@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWpf>true</UseWpf>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Speckle.Core" Version="2.8.0" />
+    <PackageReference Include="Speckle.Newtonsoft.Json" Version="12.0.3.1" />
+    <PackageReference Include="Speckle.Objects" Version="2.8.0" />
+    <PackageReference Include="SQLite.Interop.dll" Version="1.0.103" />
+    <PackageReference Include="Ionic.Zip-1.9.1.8" Version="1.9.1.8" />
+    <PackageReference Include="CefSharp.Wpf" Version="106.0.260" />
+    <PackageReference Include="cef.redist.x64" Version="106.0.26" />
+    <PackageReference Include="Chuongmep.Navis.Api.AdWindows" Version="2022.0.5" />
+    <PackageReference Include="Chuongmep.Navis.Api.Autodesk.Navisworks.Api" Version="2022.0.5" />
+    <PackageReference Include="Chuongmep.Navis.Api.Autodesk.Navisworks.ComApi" Version="2022.0.5" />
+    <PackageReference Include="Chuongmep.Navis.Api.Autodesk.Navisworks.Interop.ComApi" Version="2022.0.5" />
+    <PackageReference Include="Chuongmep.Navis.Api.navisworks.gui.roamer" Version="2022.0.5" />
+    
+  </ItemGroup>
+
+</Project>
