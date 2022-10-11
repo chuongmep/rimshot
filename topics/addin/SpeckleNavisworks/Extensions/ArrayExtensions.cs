@@ -1,7 +1,6 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
-namespace Rimshot.ArrayExtensions {
+namespace SpeckleNavisworks.Extensions {
   internal static class ArrayExtension {
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]

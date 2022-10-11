@@ -1,8 +1,7 @@
-﻿
-using Autodesk.Navisworks.Api;
+﻿using Autodesk.Navisworks.Api;
 using NavisworksApp = Autodesk.Navisworks.Api.Application;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Utilities {
   class TaskProgress {
 
     public bool progressIsCancelled = false;
@@ -10,7 +9,7 @@ namespace Rimshot {
     #region Event Handlers
 
     private void EndProgress ( Progress p = null ) {
-      progressIsCancelled = false;
+      this.progressIsCancelled = false;
 
       if ( p != null && !p.IsDisposed ) {
         p.Dispose();
@@ -29,8 +28,8 @@ namespace Rimshot {
 
     public void HandleSubOpEnd ( object sender, ProgressSubOperationEndedEventArgs e ) {
       Progress progress = e.Progress;
-      if ( progress.IsCanceled && !progressIsCancelled ) {
-        progressIsCancelled = true;
+      if ( progress.IsCanceled && !this.progressIsCancelled ) {
+        this.progressIsCancelled = true;
         //MessageBox.Show(" Cancelled.");
       }
     }

@@ -1,13 +1,10 @@
 ﻿using Autodesk.Navisworks.Api;
 using Autodesk.Navisworks.Api.Interop;
 using Speckle.Core.Models;
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Props = SpeckleNavisworks.Conversions.Properties;
 
-using Props = Rimshot.Conversions.Properties;
-
-namespace Rimshot.Conversions {
+namespace SpeckleNavisworks.Conversions {
   internal class Properties {
     static public string SanitizePropertyName ( string name ) {
       if ( name == "Item" ) {
@@ -24,14 +21,14 @@ namespace Rimshot.Conversions {
       try {
         categoryName = Props.SanitizePropertyName( propertyCategory.DisplayName );
       } catch ( Exception err ) {
-        Logging.ErrorLog( $"Category Name not converted. {err.Message}" );
+        Logging.Logging.ErrorLog( $"Category Name not converted. {err.Message}" );
         return;
       }
 
       try {
         propertyName = Props.SanitizePropertyName( property.DisplayName );
       } catch ( Exception err ) {
-        Logging.ErrorLog( $"Category Name not converted. {err.Message}" );
+        Logging.Logging.ErrorLog( $"Category Name not converted. {err.Message}" );
         return;
       }
 

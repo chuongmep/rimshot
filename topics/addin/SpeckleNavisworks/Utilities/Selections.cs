@@ -2,7 +2,7 @@
 using Autodesk.Navisworks.Api.DocumentParts;
 using NavisworksApp = Autodesk.Navisworks.Api.Application;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Utilities {
   public class Selections {
 
     public static void ShowSelected ( bool showOnlySelected = false, bool clearSelectionAfterShow = true ) {

@@ -1,18 +1,16 @@
 ﻿using Autodesk.Navisworks.Api;
 using CefSharp;
 using CefSharp.Wpf;
-using Rimshot.Views;
 using Speckle.Newtonsoft.Json;
-using System;
+using SpeckleNavisworks.Views;
 using System.Runtime.ExceptionServices;
 using System.Windows;
-using System.Windows.Controls;
 using MessageBox = System.Windows.MessageBox;
 using NavisworksApp = Autodesk.Navisworks.Api.Application;
 using Path = System.IO.Path;
 using UserControl = System.Windows.Controls.UserControl;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Plugin {
   public class Snapshot {
     [JsonProperty]
     internal string name;

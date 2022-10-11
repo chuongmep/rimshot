@@ -1,7 +1,7 @@
 ﻿using Speckle.Core.Logging;
-using System;
+using SpeckleNavisworks.Plugin;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Logging {
   public static class Logging {
     public static void ConsoleLog ( string message, ConsoleColor color = ConsoleColor.Magenta ) {
       Console.ForegroundColor = color;

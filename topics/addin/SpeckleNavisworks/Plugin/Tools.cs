@@ -1,4 +1,4 @@
-﻿namespace Rimshot {
+﻿namespace SpeckleNavisworks.Plugin {
   public static class BCFExport {
     public const string Plugin = "Rimshot.BCFPlugin";
     public const string Command = "Rimshot_Button_ExportBCF";

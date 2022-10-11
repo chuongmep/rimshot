@@ -1,15 +1,12 @@
 ﻿using Autodesk.Navisworks.Api;
 using Objects.Geometry;
-using Rimshot.ArrayExtensions;
-using Rimshot.Conversions;
 using Speckle.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using SpeckleNavisworks.Conversions;
 using ComApi = Autodesk.Navisworks.Api.Interop.ComApi;
 using ComBridge = Autodesk.Navisworks.Api.ComApi.ComApiBridge; //
+using SpeckleNavisworks.Extensions;
 
-namespace Rimshot.Geometry {
+namespace SpeckleNavisworks.Geometry {
   public class CallbackGeomListener : ComApi.InwSimplePrimitivesCB {
     public List<double> Coords { get; set; }
 
@@ -44,20 +41,20 @@ namespace Rimshot.Geometry {
       double v3Z = ( double )( float )array_v3.GetValue( 3 );
 
       //Matrix transformation
-      double T1 = Matrix[ 3 ] * v1X + Matrix[ 7 ] * v1Y + Matrix[ 11 ] * v1Z + Matrix[ 15 ];
-      double v1X_ = ( Matrix[ 0 ] * v1X + Matrix[ 4 ] * v1Y + Matrix[ 8 ] * v1Z + Matrix[ 12 ] ) / T1;
-      double v1Y_ = ( Matrix[ 1 ] * v1X + Matrix[ 5 ] * v1Y + Matrix[ 9 ] * v1Z + Matrix[ 13 ] ) / T1;
-      double v1Z_ = ( Matrix[ 2 ] * v1X + Matrix[ 6 ] * v1Y + Matrix[ 10 ] * v1Z + Matrix[ 14 ] ) / T1;
+      double T1 = this.Matrix[ 3 ] * v1X + this.Matrix[ 7 ] * v1Y + this.Matrix[ 11 ] * v1Z + this.Matrix[ 15 ];
+      double v1X_ = ( this.Matrix[ 0 ] * v1X + this.Matrix[ 4 ] * v1Y + this.Matrix[ 8 ] * v1Z + this.Matrix[ 12 ] ) / T1;
+      double v1Y_ = ( this.Matrix[ 1 ] * v1X + this.Matrix[ 5 ] * v1Y + this.Matrix[ 9 ] * v1Z + this.Matrix[ 13 ] ) / T1;
+      double v1Z_ = ( this.Matrix[ 2 ] * v1X + this.Matrix[ 6 ] * v1Y + this.Matrix[ 10 ] * v1Z + this.Matrix[ 14 ] ) / T1;
 
-      double T2 = Matrix[ 3 ] * v2X + Matrix[ 7 ] * v2Y + Matrix[ 11 ] * v2Z + Matrix[ 15 ];
-      double v2X_ = ( Matrix[ 0 ] * v2X + Matrix[ 4 ] * v2Y + Matrix[ 8 ] * v2Z + Matrix[ 12 ] ) / T2;
-      double v2Y_ = ( Matrix[ 1 ] * v2X + Matrix[ 5 ] * v2Y + Matrix[ 9 ] * v2Z + Matrix[ 13 ] ) / T2;
-      double v2Z_ = ( Matrix[ 2 ] * v2X + Matrix[ 6 ] * v2Y + Matrix[ 10 ] * v2Z + Matrix[ 14 ] ) / T2;
+      double T2 = this.Matrix[ 3 ] * v2X + this.Matrix[ 7 ] * v2Y + this.Matrix[ 11 ] * v2Z + this.Matrix[ 15 ];
+      double v2X_ = ( this.Matrix[ 0 ] * v2X + this.Matrix[ 4 ] * v2Y + this.Matrix[ 8 ] * v2Z + this.Matrix[ 12 ] ) / T2;
+      double v2Y_ = ( this.Matrix[ 1 ] * v2X + this.Matrix[ 5 ] * v2Y + this.Matrix[ 9 ] * v2Z + this.Matrix[ 13 ] ) / T2;
+      double v2Z_ = ( this.Matrix[ 2 ] * v2X + this.Matrix[ 6 ] * v2Y + this.Matrix[ 10 ] * v2Z + this.Matrix[ 14 ] ) / T2;
 
-      double T3 = Matrix[ 3 ] * v3X + Matrix[ 7 ] * v3Y + Matrix[ 11 ] * v3Z + Matrix[ 15 ];
-      double v3X_ = ( Matrix[ 0 ] * v3X + Matrix[ 4 ] * v3Y + Matrix[ 8 ] * v3Z + Matrix[ 12 ] ) / T3;
-      double v3Y_ = ( Matrix[ 1 ] * v3X + Matrix[ 5 ] * v3Y + Matrix[ 9 ] * v3Z + Matrix[ 13 ] ) / T3;
-      double v3Z_ = ( Matrix[ 2 ] * v3X + Matrix[ 6 ] * v3Y + Matrix[ 10 ] * v3Z + Matrix[ 14 ] ) / T3;
+      double T3 = this.Matrix[ 3 ] * v3X + this.Matrix[ 7 ] * v3Y + this.Matrix[ 11 ] * v3Z + this.Matrix[ 15 ];
+      double v3X_ = ( this.Matrix[ 0 ] * v3X + this.Matrix[ 4 ] * v3Y + this.Matrix[ 8 ] * v3Z + this.Matrix[ 12 ] ) / T3;
+      double v3Y_ = ( this.Matrix[ 1 ] * v3X + this.Matrix[ 5 ] * v3Y + this.Matrix[ 9 ] * v3Z + this.Matrix[ 13 ] ) / T3;
+      double v3Z_ = ( this.Matrix[ 2 ] * v3X + this.Matrix[ 6 ] * v3Y + this.Matrix[ 10 ] * v3Z + this.Matrix[ 14 ] ) / T3;
 
 
       this.Faces.Add( 3 ); //TRIANGLE FLAG
@@ -169,7 +166,7 @@ namespace Rimshot.Geometry {
       List<CallbackGeomListener> callbackListeners = new List<CallbackGeomListener>();
       // create the callback object
 
-      foreach ( ComApi.InwOaPath3 path in ComSelection.Paths() ) {
+      foreach ( ComApi.InwOaPath3 path in this.ComSelection.Paths() ) {
         CallbackGeomListener callbackListener = new CallbackGeomListener();
         foreach ( ComApi.InwOaFragment3 fragment in path.Fragments() ) {
           ComApi.InwLTransform3f3 localToWorld = ( ComApi.InwLTransform3f3 )( object )fragment.GetLocalToWorldMatrix();
@@ -216,9 +213,9 @@ namespace Rimshot.Geometry {
     public NavisVertex Vertex2 { get; set; }
     public NavisVertex Vertex3 { get; set; }
     public NavisTriangle ( NavisVertex v1, NavisVertex v2, NavisVertex v3 ) {
-      Vertex1 = v1;
-      Vertex2 = v2;
-      Vertex3 = v3;
+      this.Vertex1 = v1;
+      this.Vertex2 = v2;
+      this.Vertex3 = v3;
     }
   }
   public class NavisDoubleTriangle {
@@ -226,16 +223,16 @@ namespace Rimshot.Geometry {
     public NavisDoubleVertex Vertex2 { get; set; }
     public NavisDoubleVertex Vertex3 { get; set; }
     public NavisDoubleTriangle ( NavisDoubleVertex v1, NavisDoubleVertex v2, NavisDoubleVertex v3 ) {
-      Vertex1 = v1;
-      Vertex2 = v2;
-      Vertex3 = v3;
+      this.Vertex1 = v1;
+      this.Vertex2 = v2;
+      this.Vertex3 = v3;
     }
   }
   public class NavisVertex {
     public NavisVertex ( float x, float y, float z ) {
-      X = x;
-      Y = y;
-      Z = z;
+      this.X = x;
+      this.Y = y;
+      this.Z = z;
     }
     public float X { get; set; }
     public float Y { get; set; }
@@ -243,9 +240,9 @@ namespace Rimshot.Geometry {
   }
   public class NavisDoubleVertex {
     public NavisDoubleVertex ( double x, double y, double z ) {
-      X = x;
-      Y = y;
-      Z = z;
+      this.X = x;
+      this.Y = y;
+      this.Z = z;
     }
     public double X { get; set; }
     public double Y { get; set; }
@@ -261,24 +258,24 @@ namespace Rimshot.Geometry {
       this.Triangles = Triangles;
 
       //Add indices and vertices
-      Indices = new List<int>();
-      Vertices = new List<float>();
+      this.Indices = new List<int>();
+      this.Vertices = new List<float>();
       int index = 0;
 
       //create indices and vertices lists
       foreach ( NavisTriangle triangle in Triangles ) {
-        Indices.Add( index++ );
-        Indices.Add( index++ );
-        Indices.Add( index++ );
-        Vertices.Add( triangle.Vertex1.X );
-        Vertices.Add( triangle.Vertex1.Y );
-        Vertices.Add( triangle.Vertex1.Z );
-        Vertices.Add( triangle.Vertex2.X );
-        Vertices.Add( triangle.Vertex2.Y );
-        Vertices.Add( triangle.Vertex2.Z );
-        Vertices.Add( triangle.Vertex3.X );
-        Vertices.Add( triangle.Vertex3.Y );
-        Vertices.Add( triangle.Vertex3.Z );
+        this.Indices.Add( index++ );
+        this.Indices.Add( index++ );
+        this.Indices.Add( index++ );
+        this.Vertices.Add( triangle.Vertex1.X );
+        this.Vertices.Add( triangle.Vertex1.Y );
+        this.Vertices.Add( triangle.Vertex1.Z );
+        this.Vertices.Add( triangle.Vertex2.X );
+        this.Vertices.Add( triangle.Vertex2.Y );
+        this.Vertices.Add( triangle.Vertex2.Z );
+        this.Vertices.Add( triangle.Vertex3.X );
+        this.Vertices.Add( triangle.Vertex3.Y );
+        this.Vertices.Add( triangle.Vertex3.Z );
       }
     }
 
@@ -316,7 +313,7 @@ namespace Rimshot.Geometry {
       foreach ( ModelItem item in descendants ) {
         bool hasGeometry = item.HasGeometry;
         bool isVisible = !item.IsHidden;
-        bool isSelected = selectedItemsAndDescendants.IsSelected( item );
+        bool isSelected = this.selectedItemsAndDescendants.IsSelected( item );
 
         if ( hasGeometry && isVisible && isSelected ) {
           items.Add( item );
@@ -394,7 +391,7 @@ namespace Rimshot.Geometry {
         List<double> vertices = new List<double>();
         List<int> faces = new List<int>();
 
-        Vector3D move = TransformVector3D;
+        Vector3D move = this.TransformVector3D;
 
         int triangleCount = Triangles.Count;
         if ( triangleCount > 0 ) {

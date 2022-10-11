@@ -1,25 +1,24 @@
 ﻿using Autodesk.Navisworks.Api;
 using Autodesk.Navisworks.Api.DocumentParts;
 using CefSharp;
-using Rimshot.Conversions;
-using Rimshot.Geometry;
-using Rimshot.SpeckleApi;
-using Rimshot.Views;
 using Speckle.Core.Api;
 using Speckle.Core.Models;
 using Speckle.Core.Transports;
 using Speckle.Newtonsoft.Json;
+using SpeckleNavisworks.Conversions;
+using SpeckleNavisworks.Geometry;
+using SpeckleNavisworks.Speckle;
+using SpeckleNavisworks.Views;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Windows;
 using ComApi = Autodesk.Navisworks.Api.Interop.ComApi;
 using ComBridge = Autodesk.Navisworks.Api.ComApi.ComApiBridge;
 using MessageBox = System.Windows.MessageBox;
 using Navis = Autodesk.Navisworks.Api.Application;
 using NavisworksApp = Autodesk.Navisworks.Api.Application;
-using Props = Rimshot.Conversions.Properties;
+using Props = SpeckleNavisworks.Conversions.Properties;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Plugin {
 
   public abstract class UIBindings {
 #if DEBUG
@@ -48,24 +47,24 @@ namespace Rimshot {
 
     public virtual void NotifyUI ( string eventName, dynamic eventInfo ) {
       string script = string.Format( "window.EventBus.$emit('{0}',{1})", eventName, JsonConvert.SerializeObject( eventInfo ) );
-      Browser.GetMainFrame().EvaluateScriptAsync( script );
+      this.Browser.GetMainFrame().EvaluateScriptAsync( script );
     }
 
     public virtual void CommitStoreMutationUI ( string storeMutationName, string args = null ) {
       string script = string.Format( "window.Store.commit('{0}', '{1}')", storeMutationName, args );
       try {
-        Browser.GetMainFrame().EvaluateScriptAsync( script );
+        this.Browser.GetMainFrame().EvaluateScriptAsync( script );
       } catch ( Exception e ) {
-        Logging.ErrorLog( e.Message );
+        Logging.Logging.ErrorLog( e.Message );
       }
     }
 
     public virtual void DispatchStoreActionUI ( string storeActionName, string args = null ) {
       string script = string.Format( "window.Store.dispatch('{0}', '{1}')", storeActionName, args );
       try {
-        Browser.GetMainFrame().EvaluateScriptAsync( script );
+        this.Browser.GetMainFrame().EvaluateScriptAsync( script );
       } catch ( Exception e ) {
-        Logging.ErrorLog( e.Message );
+        Logging.Logging.ErrorLog( e.Message );
       }
     }
 
@@ -78,7 +77,7 @@ namespace Rimshot {
     public virtual void AddImage () => SendIssueView();
 
     public virtual string UpdateView ( string camera ) {
-      Logging.ConsoleLog( camera );
+      Logging.Logging.ConsoleLog( camera );
       return camera;
     }
 
@@ -94,15 +93,15 @@ namespace Rimshot {
     /// <param name="commitMessage">Allows for the calling UI to override this and include a custom commit message.</param>
     public async void CommitSelection ( object payload, string commitMessage = "Rimshot commit." ) {
 
-      Logging.ConsoleLog( "Negotiating with the Speckle Server." );
+      Logging.Logging.ConsoleLog( "Negotiating with the Speckle Server." );
 
       dynamic commitPayload = payload;
 
       this.speckle.HostUrl = commitPayload.host;
       this.speckle.rimshotIssueId = commitPayload.issueId;
 
-      if ( speckle.HostUrl != speckle.Client.ServerUrl ) {
-        Logging.ErrorLog( $"Host server Url for the issue ({speckle.HostUrl}) does not match the client server Url ({speckle.Client.ServerUrl}). Please check your configuration." );
+      if ( this.speckle.HostUrl != this.speckle.Client.ServerUrl ) {
+        Logging.Logging.ErrorLog( $"Host server Url for the issue ({this.speckle.HostUrl}) does not match the client server Url ({this.speckle.Client.ServerUrl}). Please check your configuration." );
         return;
       }
 
@@ -110,23 +109,23 @@ namespace Rimshot {
 
       UIBindings app = this;
 
-      speckle.RimshotApp = app;
+      this.speckle.RimshotApp = app;
 
-      string description = $"issueId:{speckle.rimshotIssueId}";
+      string description = $"issueId:{this.speckle.rimshotIssueId}";
 
-      if ( speckle.Client == null ) { return; }
+      if ( this.speckle.Client == null ) { return; }
 
-      await speckle.TryGetStream( commitPayload.stream );
-      await speckle.TryGetBranch( commitPayload.branch, description );
+      await this.speckle.TryGetStream( commitPayload.stream );
+      await this.speckle.TryGetBranch( commitPayload.branch, description );
 
-      if ( speckle.Branch == null || speckle.Stream == null ) { return; };
+      if ( this.speckle.Branch == null || this.speckle.Stream == null ) { return; };
 
-      Logging.ConsoleLog( $"Stream: {speckle.StreamId}, Host: {speckle.HostUrl}, Branch: {speckle.BranchName}, Issue: {speckle.rimshotIssueId}" );
+      Logging.Logging.ConsoleLog( $"Stream: {this.speckle.StreamId}, Host: {this.speckle.HostUrl}, Branch: {this.speckle.BranchName}, Issue: {this.speckle.rimshotIssueId}" );
 
 
       // Current document, models and selected elements.
-      ActiveDocument = NavisworksApp.ActiveDocument;
-      DocumentModels documentModels = ActiveDocument.Models;
+      this.ActiveDocument = NavisworksApp.ActiveDocument;
+      DocumentModels documentModels = this.ActiveDocument.Models;
       ModelItemCollection appSelectedItems = NavisworksApp.ActiveDocument.CurrentSelection.SelectedItems;
 
       // Were the selection to change mid-commit, accessing the selected set would fail.
@@ -135,12 +134,12 @@ namespace Rimshot {
       appSelectedItems.DescendantsAndSelf.CopyTo( this.geometry.selectedItemsAndDescendants );
 
       if ( this.geometry.selectedItems.IsEmpty ) {
-        Logging.ConsoleLog( "Nothing Selected." );
+        Logging.Logging.ConsoleLog( "Nothing Selected." );
         NotifyUI( "error", JsonConvert.SerializeObject( new { message = "Nothing Selected." } ) );
         NotifyUI( "commit_sent", new {
           commitId = "",
-          issueId = speckle.rimshotIssueId,
-          streamId = speckle.StreamId,
+          issueId = this.speckle.rimshotIssueId,
+          streamId = this.speckle.StreamId,
           objectId = ""
         } );
         return;
@@ -163,8 +162,8 @@ namespace Rimshot {
       };
 
       this.geometry.TransformVector = new Objects.Geometry.Vector {
-        x = 0 - geometry.TransformVector3D.X,
-        y = 0 - geometry.TransformVector3D.Y,
+        x = 0 - this.geometry.TransformVector3D.X,
+        y = 0 - this.geometry.TransformVector3D.Y,
         z = 0
       };
 
@@ -204,7 +203,7 @@ namespace Rimshot {
         fragmentTasks.Add( Task.Run( () => {
           this.geometry.AddFragments( entry.Key );
           doneElements.Push( true );
-          Logging.ConsoleLog( $"{doneElements.Count} of {geometryDict.Count}", ConsoleColor.DarkGreen );
+          Logging.Logging.ConsoleLog( $"{doneElements.Count} of {geometryDict.Count}", ConsoleColor.DarkGreen );
         } ) );
       }
       Task t = Task.WhenAll( fragmentTasks );
@@ -225,14 +224,14 @@ namespace Rimshot {
         // Do the geometry conversion work.
         this.geometry.TranslateGeometryElement( navisGeometry );
 
-        QuickProperties = new Base();
+        this.QuickProperties = new Base();
 
         // Do the properties and hierarchy conversion work.
         TranslateHierarchyElement( navisGeometry );
 
         //doneElements.Push( true );
         NotifyUI( "element-progress", JsonConvert.SerializeObject( new { current = n, count = keyList.Count } ) );
-        Logging.ConsoleLog( $"Element {n} of {geometryDict.Keys.Count}" );
+        Logging.Logging.ConsoleLog( $"Element {n} of {geometryDict.Keys.Count}" );
         //} ) 
         //);
       }
@@ -260,13 +259,13 @@ namespace Rimshot {
       this.geometry.selectedItems.Clear();
 
       string[] stringseparators = new string[] { "/" };
-      myCommit[ "Issue Number" ] = speckle.BranchName.Split( stringseparators, StringSplitOptions.None )[ 1 ];
-      myCommit[ "applicationId" ] = speckle.rimshotIssueId;
+      myCommit[ "Issue Number" ] = this.speckle.BranchName.Split( stringseparators, StringSplitOptions.None )[ 1 ];
+      myCommit[ "applicationId" ] = this.speckle.rimshotIssueId;
 
-      ServerTransport transport = new ServerTransport( speckle.Account, speckle.StreamId );
+      ServerTransport transport = new ServerTransport( this.speckle.Account, this.speckle.StreamId );
       string hash = Operations.Send( myCommit, new List<ITransport> { transport } ).Result;
 
-      string commitId = speckle.Client.CommitCreate( new CommitCreateInput() {
+      string commitId = this.speckle.Client.CommitCreate( new CommitCreateInput() {
         branchName = this.speckle.BranchName,
         message = commitMessage,
         objectId = hash,
@@ -274,7 +273,7 @@ namespace Rimshot {
         sourceApplication = "Rimshot"
       } ).Result;
 
-      Commit commitObject = speckle.Client.CommitGet( speckle.StreamId, commitId ).Result;
+      Commit commitObject = this.speckle.Client.CommitGet( this.speckle.StreamId, commitId ).Result;
       string referencedObject = commitObject.referencedObject;
 
       NotifyUI( "commit_sent", new {
@@ -292,9 +291,9 @@ namespace Rimshot {
       // Geometry Object may be the first object.
       if ( firstObject == null ) {
         // Process the Geometry Base object as the root object.
-        geometrynode.Base = ToSpeckle.BuildBaseObjectTree( geometrynode.ModelItem, geometrynode, this.QuickPropertyDefinitions, ref QuickProperties );
+        geometrynode.Base = ToSpeckle.BuildBaseObjectTree( geometrynode.ModelItem, geometrynode, this.QuickPropertyDefinitions, ref this.QuickProperties );
       } else {
-        geometrynode.Base = ToSpeckle.BuildBaseObjectTree( firstObject, geometrynode, this.QuickPropertyDefinitions, ref QuickProperties );
+        geometrynode.Base = ToSpeckle.BuildBaseObjectTree( firstObject, geometrynode, this.QuickPropertyDefinitions, ref this.QuickProperties );
       }
     }
 

@@ -1,8 +1,7 @@
 ﻿using Autodesk.Navisworks.Api.Plugins;
-using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Plugin {
 
   #region WebViewPlugin
 

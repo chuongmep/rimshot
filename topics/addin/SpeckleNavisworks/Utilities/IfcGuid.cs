@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Utilities {
 
   /// <summary>
   /// Conversion methods between an IFC 

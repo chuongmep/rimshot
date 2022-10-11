@@ -1,14 +1,10 @@
 ﻿using Autodesk.Navisworks.Api;
 using Objects.Geometry;
-using Rimshot.Geometry;
 using Speckle.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using SpeckleNavisworks.Geometry;
+using Props = SpeckleNavisworks.Conversions.Properties;
 
-using Props = Rimshot.Conversions.Properties;
-
-namespace Rimshot.Conversions {
+namespace SpeckleNavisworks.Conversions {
   internal class ToSpeckle {
 
     static public Box BoxToSpeckle ( BoundingBox3D boundingBox3D ) {

@@ -1,8 +1,6 @@
-﻿using System.Windows;
-using System.Windows.Forms;
-using MessageBox = System.Windows.MessageBox;
+﻿using MessageBox = System.Windows.MessageBox;
 
-namespace Rimshot.Conversions {
+namespace SpeckleNavisworks.Conversions {
   internal class Units {
     static public double GetUnits () {
       string units = Autodesk.Navisworks.Api.Application.ActiveDocument.Units.ToString();

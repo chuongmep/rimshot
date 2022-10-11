@@ -1,8 +1,7 @@
 ﻿using Autodesk.Navisworks.Api;
-using System;
 using Color = System.Drawing.Color;
 
-namespace Rimshot.Conversions {
+namespace SpeckleNavisworks.Conversions {
   class Materials {
     static public Objects.Other.RenderMaterial TranslateMaterial ( ModelItem geom ) {
 

@@ -1,12 +1,10 @@
 ﻿using Autodesk.Navisworks.Api;
 using Autodesk.Navisworks.Api.Interop;
 using Speckle.Newtonsoft.Json;
-using System;
-using System.Windows;
 using MessageBox = System.Windows.MessageBox;
 using NavisworksApp = Autodesk.Navisworks.Api.Application;
 
-namespace Rimshot.Views {
+namespace SpeckleNavisworks.Views {
   public class Views {
     public Views () { }
 

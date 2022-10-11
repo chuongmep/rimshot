@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Rimshot.Conversions {
+﻿namespace SpeckleNavisworks.Conversions {
   class Colors {
     static public System.Drawing.Color NavisColorToColor ( Autodesk.Navisworks.Api.Color color ) {
       return System.Drawing.Color.FromArgb(

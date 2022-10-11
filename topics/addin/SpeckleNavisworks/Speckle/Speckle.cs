@@ -2,17 +2,16 @@
 using Speckle.Core.Credentials;
 using Speckle.Core.Logging;
 using Speckle.Newtonsoft.Json;
-using System;
-using System.Threading.Tasks;
+using SpeckleNavisworks.Plugin;
 using Stream = Speckle.Core.Api.Stream;
 
-namespace Rimshot.SpeckleApi {
+namespace SpeckleNavisworks.Speckle {
   internal class SpeckleServer {
     internal string rimshotIssueId;
 
     public string HostUrl { get; set; }  // TODO: Feedback to the UI when the Client Account does not match the HostUrl. Handle the ability to Commit.
-    public string StreamId { get { if ( this.Stream != null ) { return Stream.id; } return null; } }
-    public string BranchName { get { if ( Branch != null ) { return Branch.name; } return null; } }
+    public string StreamId { get { if ( this.Stream != null ) { return this.Stream.id; } return null; } }
+    public string BranchName { get { if ( this.Branch != null ) { return this.Branch.name; } return null; } }
     public string CommitId { get; set; }
     public Account Account { get; set; }
     public Client Client { get; set; }
@@ -25,41 +24,41 @@ namespace Rimshot.SpeckleApi {
       Account defaultAccount = AccountManager.GetDefaultAccount();
 
       if ( defaultAccount == null ) {
-        Logging.ErrorLog( new SpeckleException( $"You do not have any accounts active. Please create one or add it to the Speckle Manager." ), this.RimshotApp );
+        Logging.Logging.ErrorLog( new SpeckleException( $"You do not have any accounts active. Please create one or add it to the Speckle Manager." ), this.RimshotApp );
         return;
       }
 
       this.Account = defaultAccount;
 
       try {
-        Client = new Client( this.Account ); // TODO: Feedback to the UI when the Client Account does not match the HostUrl.
+        this.Client = new Client( this.Account ); // TODO: Feedback to the UI when the Client Account does not match the HostUrl.
       } catch ( Exception e ) {
-        Logging.ErrorLog( e );
+        Logging.Logging.ErrorLog( e );
       }
     }
 
     public async Task TryGetStream ( string streamId ) {
       this.Stream = null;
       try {
-        Stream = await Client.StreamGet( streamId );
+        this.Stream = await this.Client.StreamGet( streamId );
       } catch {
-        Logging.ErrorLog( new SpeckleException( $"You don't have access to stream {streamId} on server {this.HostUrl}, or the stream does not exist." ), this.RimshotApp );
+        Logging.Logging.ErrorLog( new SpeckleException( $"You don't have access to stream {streamId} on server {this.HostUrl}, or the stream does not exist." ), this.RimshotApp );
       }
     }
 
     private Task<Branch> CreateBranch ( string name, string description ) {
 
       try {
-        Task<string> branchId = Client.BranchCreate( new BranchCreateInput() {
-          streamId = StreamId,
+        Task<string> branchId = this.Client.BranchCreate( new BranchCreateInput() {
+          streamId = this.StreamId,
           name = name,
           description = description
         } );
       } catch ( Exception e ) {
-        Logging.ErrorLog( e );
+        Logging.Logging.ErrorLog( e );
       }
 
-      Task<Branch> branch = Client.BranchGet( this.StreamId, name );
+      Task<Branch> branch = this.Client.BranchGet( this.StreamId, name );
 
       return branch;
     }
@@ -70,28 +69,28 @@ namespace Rimshot.SpeckleApi {
 
       // Get Branch and create if it doesn't exist.
       try {
-        this.Branch = await Client.BranchGet( this.StreamId, name );
-        if ( Branch is null ) {
+        this.Branch = await this.Client.BranchGet( this.StreamId, name );
+        if ( this.Branch is null ) {
           try {
-            Branch = await CreateBranch( name, description );
+            this.Branch = await CreateBranch( name, description );
           } catch ( Exception ) {
-            Logging.ErrorLog( new SpeckleException( $"Unable to find an issue branch for {BranchName}" ), RimshotApp );
+            Logging.Logging.ErrorLog( new SpeckleException( $"Unable to find an issue branch for {this.BranchName}" ), this.RimshotApp );
           }
         }
       } catch ( Exception ) {
-        Logging.ErrorLog( new SpeckleException( $"Unable to find or create an issue branch for {this.BranchName}" ), RimshotApp );
+        Logging.Logging.ErrorLog( new SpeckleException( $"Unable to find or create an issue branch for {this.BranchName}" ), this.RimshotApp );
         return;
       }
 
-      if ( Branch == null ) {
+      if ( this.Branch == null ) {
         try {
-          Branch = Client.BranchGet( this.StreamId, this.BranchName, 1 ).Result;
+          this.Branch = this.Client.BranchGet( this.StreamId, this.BranchName, 1 ).Result;
 
-          if ( Branch != null ) {
-            RimshotApp.NotifyUI( "branch_updated", JsonConvert.SerializeObject( new { branch = Branch.name, rimshotIssueId } ) );
+          if ( this.Branch != null ) {
+            this.RimshotApp.NotifyUI( "branch_updated", JsonConvert.SerializeObject( new { branch = this.Branch.name, this.rimshotIssueId } ) );
           }
         } catch ( Exception ) {
-          Logging.ErrorLog( new SpeckleException( $"Still unable to find an issue branch for {BranchName}" ), RimshotApp );
+          Logging.Logging.ErrorLog( new SpeckleException( $"Still unable to find an issue branch for {this.BranchName}" ), this.RimshotApp );
           return;
         }
       }

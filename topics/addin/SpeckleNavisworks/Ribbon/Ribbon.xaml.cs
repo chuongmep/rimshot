@@ -1,10 +1,10 @@
 ﻿using Autodesk.Navisworks.Api.Plugins;
-using Autodesk.Windows;
+using SpeckleNavisworks.Plugin;
+using SpeckleNavisworks.Utilities;
 using System.Text;
-using System.Windows.Forms;
 using NavisworksApp = Autodesk.Navisworks.Api.Application;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Ribbon {
 
   [Plugin( "Rimshot", "Rimshot", DisplayName = "Rimshot" )]
   [Strings( "Ribbon.name" )]
@@ -22,7 +22,7 @@ namespace Rimshot {
              DisplayName = "Register"
              )]
 
-  [Command( Speckle.Command,
+  [Command( Plugin.Speckle.Command,
              CallCanExecute = CallCanExecute.DocumentNotClear,
              Icon = "icon_speckle16.ico",
              LargeIcon = "icon_speckle32.ico",

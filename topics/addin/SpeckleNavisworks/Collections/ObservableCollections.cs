@@ -1,9 +1,8 @@
 ﻿using Autodesk.Navisworks.Api;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Rimshot {
+namespace SpeckleNavisworks.Collections {
 
   /// <summary>
   /// Jira is the main datacontext, it just contains a IssuesBCFCollection, but I still follow this structure in case 
@@ -16,10 +15,10 @@ namespace Rimshot {
 
     public ObservableCollection<IssueBCF> IssuesBCFCollection {
       get {
-        return issuesBCFCollection;
+        return this.issuesBCFCollection;
       }
       set {
-        issuesBCFCollection = value;
+        this.issuesBCFCollection = value;
         NotifyPropertyChanged( "IssuesBCFCollection" );
       }
     }
